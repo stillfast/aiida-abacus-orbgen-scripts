@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aiida-abacus-orbgen-scripts"
+version = "0.1.0"
+description = "Scripts that choose the ABACUS NAO generation parameters (ecutwfc, then r_cut/ecutjy)"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = ["aiida-core>=2.0", "numpy", "matplotlib"]
+
+[tool.setuptools.packages.find]
+include = ["utils*"]
