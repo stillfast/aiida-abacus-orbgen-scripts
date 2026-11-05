@@ -57,6 +57,12 @@ def main() -> int:
     ap.add_argument("--r-cut", type=float, nargs="+", required=True)
     ap.add_argument("--ecutjy", type=float, nargs="+", required=True)
     ap.add_argument("--l-max", type=int, default=4)
+    ap.add_argument("--mem-gb", type=float, default=190.0,
+                    help="per-node memory in GB.  AiiDA renders "
+                         "'#SBATCH --mem=<max_memory_kb // 1024>', and the computer default "
+                         "(50000000 kB = 48.8 GB) is not enough for a 12 a.u. primitive. "
+                         "190 GB matches the 276-node / 190 GB class on yeesuan; asking "
+                         "for more pins the scarce 384 GB nodes.")
     ap.add_argument("--ecutwfc", type=float, default=180.0,
                     help="plane-wave cutoff chosen in stage 1 (default 180)")
     ap.add_argument("--nbands", type=int, default=60,
@@ -109,6 +115,12 @@ def main() -> int:
 
     # `abacus.abacus` declares kpoints as required even for gamma_only runs
     kpoints = template.inputs.kpoints if "kpoints" in template.inputs else None
+
+    # AiiDA renders the SLURM header as `#SBATCH --mem=<max_memory_kb // 1024>`, taken
+    # from `metadata.options.max_memory_kb`.  The computer default here is 50000000 kB
+    # (~49 GB), which is fine for the small EOS ladders but OOMs a 12 a.u. / 125 Ry
+    # primitive (995 functions/atom).  Ask for the big nodes explicitly.
+    options["max_memory_kb"] = int(args.mem_gb * 1024 * 1024)   # -> --mem=<GB*1024> MB
 
     scf_parameters = {
         "nspin": 1, "ntype": 1, "basis_type": "lcao", "ks_solver": "genelpa",
