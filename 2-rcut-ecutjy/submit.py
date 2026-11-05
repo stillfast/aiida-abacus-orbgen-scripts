@@ -130,6 +130,10 @@ def main() -> int:
         "smearing_method": "gauss", "smearing_sigma": 0.02,
         "mixing_type": "broyden", "mixing_beta": 0.4, "mixing_ndim": 12, "mixing_gg0": 0,
         "out_mat_hs": "1 12", "out_mat_tk": "1 12",
+        # without this ABACUS writes no WFC_NAO_GAMMA{k}.txt and the spillage fit dies
+        # with FileNotFoundError on the wavefunction file
+        "out_wfc_lcao": 1,
+        "printe": 1, "device": "cpu",
     }
 
     points = [{"r_cut": r, "ecutjy": e, "l_max": args.l_max}
