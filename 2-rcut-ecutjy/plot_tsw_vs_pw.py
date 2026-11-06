@@ -44,7 +44,9 @@ def collect(pw_refs: dict[str, float]) -> list[dict]:
 
     load_profile("aiida_profile")
     rows, seen = [], set()
-    for label in ("orbgen-rcut-ecutjy", "orbgen-control-r10-j150"):
+    # the large-memory points live in their own group, so scan every campaign group
+    for label in ("orbgen-rcut-ecutjy", "orbgen-rcut-ecutjy-d2",
+                  "orbgen-control-r10-j150"):
         try:
             group = Group.collection.get(label=label)
         except Exception:                                        # noqa: BLE001
