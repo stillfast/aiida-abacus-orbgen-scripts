@@ -82,7 +82,7 @@ def main() -> int:
 
     fig.suptitle("ABACUS plane-wave cutoff convergence, U2 dimers", fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
-    out = HERE.parent / "demo" / args.out
+    out = HERE / args.out          # next to the stage, not in demo/
     fig.savefig(out, dpi=150)
     print(f"wrote {out}")
 
