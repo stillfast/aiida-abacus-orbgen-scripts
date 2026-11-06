@@ -33,6 +33,9 @@ def main() -> int:
     ap.add_argument("--l-max", type=int, default=4)
     ap.add_argument("--mem-gb", type=float, default=190.0,
                     help="per-node memory in GB (the computer default is only 48.8 GB)")
+    ap.add_argument("--queue", default=None,
+                    help="SLURM partition; overrides the template's queue_name "
+                         "(e.g. d2_ys for the large-memory nodes)")
     ap.add_argument("--group", default="orbgen-rcut-ecutjy")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
@@ -58,6 +61,8 @@ def main() -> int:
         if value not in (None, {}):
             options[key] = value
     options["max_memory_kb"] = int(args.mem_gb * 1024 * 1024)
+    if args.queue:
+        options["queue_name"] = args.queue
 
     # `AtomicOrbitalData` is not an `aiida.orm.UpfData`, so unwrap the bare UPF; the
     # filename must keep the element prefix or UpfData refuses to parse it
