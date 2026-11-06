@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-"""TSW (NSW primitive) vs PW total-energy error vs r_cut, one curve per ecutjy.
+"""TSW (NSW primitive) basis vs plane waves: total-energy error against r_cut.
 
-Reads the finished ``abacus.orbgen.base`` workchains out of AiiDA: every one of them has
-already run a *primitive-basis* SCF per reference geometry, so the only extra ingredient
-is a plane-wave energy for the same geometry.  The PW references are taken from the
-stage-1 cutoff ladder (ecutwfc 180), which uses the same 35 Bohr cell.
+x = r_cut (a.u.), y = |E_TSW - E_PW| in meV/atom on a **linear** axis, one curve per
+ecutjy.  Both axes are per atom, matching the paper's Table II convention
+("总能量, eV/atom") and its chemical-accuracy bar of 1 kcal/mol = 43.364 meV/atom.
 
-The criterion is the paper's eps_NSW^PW per dimer; the plot shows meV/atom with the
-1 kcal/mol/dimer line drawn in.
+Note the convention: the project's older `rcut_lmax` tables quoted the error per
+**dimer**, and 1 kcal/mol there is 43.364 meV per dimer = 21.68 meV/atom, i.e. twice as
+strict.  Mixing the two shifts every verdict by a factor of two, so the figure states
+the per-atom value and the code keeps the conversion explicit.
 """
 from __future__ import annotations
 
@@ -19,12 +20,12 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
 
 KCAL_MEV = 43.364
 
 
 def energy_of(node):
-    """`!FINAL_ETOT_IS` from the retrieved running log."""
     rf = node.outputs.retrieved
     for sub in ("OUT.aiida", "OUT.ABACUS"):
         try:
@@ -64,14 +65,13 @@ def collect(pw_refs: dict[str, float]) -> list[dict]:
                 m = re.search(r"dimer_(\d)_(\d+)_", child.label or "")
                 if m:
                     energies[f"{m.group(1)}.{m.group(2)}"] = energy_of(child)
-            deltas = [(energies[b] - e) / 2 * 1000.0             # meV/atom, 2 atoms
-                      for b, e in pw_refs.items() if energies.get(b) is not None]
+            deltas = [(energies[b] - e) / 2 * 1000.0 for b, e in pw_refs.items()
+                      if energies.get(b) is not None]
             if not deltas:
                 continue
             seen.add(key)
             rows.append({"ecutjy": s["ecutjy"], "r_cut": s["r_cut"],
-                         "dE_meV_atom": sum(deltas) / len(deltas),
-                         "n": len(deltas), "pk": node.pk})
+                         "dE": sum(deltas) / len(deltas), "pk": node.pk})
     return rows
 
 
@@ -80,46 +80,56 @@ def main() -> int:
     ap.add_argument("--out", default="tsw_vs_pw.png")
     args = ap.parse_args()
 
-    # PW reference at ecutwfc 180, 35 Bohr cell (stage-1 ladder, PKs 561552 / 561562)
-    pw = {"2.10": -4951.807006023504, "2.40": -4952.064018093108}
-
+    pw = {"2.10": -4951.807006023504, "2.40": -4952.064018093108}   # ecutwfc 180
     rows = collect(pw)
     if not rows:
         print("no finished points")
         return 2
 
-    method = {"100": "o-", "125": "s-", "150": "^-"}
-    colours = {100.0: "#c0392b", 125.0: "#2471a3", 150.0: "#1e8449"}
-    fig, ax = plt.subplots(figsize=(9.0, 6.0))
+    plt.rcParams.update({
+        "font.family": "DejaVu Sans", "font.size": 11,
+        "axes.linewidth": 1.1, "xtick.direction": "in", "ytick.direction": "in",
+        "xtick.top": True, "ytick.right": True, "xtick.major.size": 5,
+        "ytick.major.size": 5, "xtick.minor.size": 2.6, "ytick.minor.size": 2.6,
+        "xtick.minor.visible": True, "ytick.minor.visible": True,
+        "legend.frameon": False, "savefig.dpi": 300, "savefig.bbox": "tight",
+    })
+
+    style = {100.0: ("#c0392b", "s"), 125.0: ("#2471a3", "o"), 150.0: ("#1e8449", "^")}
+    fig, ax = plt.subplots(figsize=(5.2, 4.0))
+
     for e in sorted({r["ecutjy"] for r in rows}):
         sel = sorted([r for r in rows if r["ecutjy"] == e], key=lambda r: r["r_cut"])
-        ax.plot([r["r_cut"] for r in sel], [r["dE_meV_atom"] for r in sel],
-                method.get(f"{e:g}", "o-"), color=colours.get(e, "k"), ms=8,
-                mfc="white", mew=1.6, lw=1.8, label=f"ecutjy = {e:g} Ry")
-        for r in sel:
-            ax.annotate(f"{r['dE_meV_atom']/KCAL_MEV*2:.2f}",
-                        (r["r_cut"], r["dE_meV_atom"]), textcoords="offset points",
-                        xytext=(0, 9), fontsize=7.5, ha="center", color=colours.get(e, "k"))
+        colour, marker = style.get(e, ("k", "o"))
+        ax.plot([r["r_cut"] for r in sel], [r["dE"] for r in sel], "-",
+                color=colour, lw=1.5, zorder=2)
+        ax.plot([r["r_cut"] for r in sel], [r["dE"] for r in sel], marker,
+                color=colour, ms=7, mfc="white", mew=1.5, zorder=3,
+                label=rf"$E_{{\rm cut}}^{{\rm jY}}$ = {e:g} Ry")
 
-    bar = KCAL_MEV / 2.0          # 1 kcal/mol per dimer, expressed per atom
-    ax.axhline(bar, color="red", ls="--", lw=1.4)
-    ax.text(ax.get_xlim()[0] if ax.get_xlim()[0] else 8.5, bar * 1.06,
-            "1 kcal/mol per dimer", color="red", fontsize=9)
-    ax.set_yscale("log")
-    ax.set_xlabel(r"$r_{\rm cut}$  (a.u.)", fontsize=12)
-    ax.set_ylabel(r"$|E_{\rm TSW}-E_{\rm PW}|$  (meV/atom)", fontsize=12)
-    ax.set_title("TSW (primitive) basis vs plane waves, ecutwfc = 180 Ry\n"
-                 "numbers above the markers: kcal/mol per U$_2$ dimer", fontsize=11)
-    ax.legend(fontsize=10)
-    ax.grid(alpha=0.3, which="both")
+    ax.axhline(KCAL_MEV, color="0.25", ls="--", lw=1.1, zorder=1)
+    ax.annotate(r"1 kcal/mol = 43.4 meV/atom", xy=(9.0, KCAL_MEV),
+                xytext=(0, 5), textcoords="offset points",
+                fontsize=9.5, color="0.15", va="bottom")
+
+    ax.set_xlabel(r"$r_{\rm cut}$  (a.u.)")
+    ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom)")
+    ax.set_xlim(8.6, 12.4)
+    ax.set_ylim(0, 600)
+    ax.xaxis.set_minor_locator(AutoMinorLocator(2))
+    ax.yaxis.set_minor_locator(AutoMinorLocator(2))
+    ax.legend(loc="upper right", handlelength=1.6, borderaxespad=0.4)
     fig.tight_layout()
+
     out = Path(__file__).resolve().parent / args.out
-    fig.savefig(out, dpi=150)
+    fig.savefig(out)
     print(f"wrote {out}")
-    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'dE meV/at':>12}{'kcal/dimer':>12}  pk")
+
+    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'dE meV/at':>12}{'kcal/mol/atom':>15}"
+          f"{'kcal/mol/dimer':>16}")
     for r in sorted(rows, key=lambda x: (x["ecutjy"], x["r_cut"])):
-        print(f"{r['ecutjy']:>7g}{r['r_cut']:>7g}{r['dE_meV_atom']:>12.1f}"
-              f"{r['dE_meV_atom']/KCAL_MEV*2:>12.2f}  {r['pk']}")
+        print(f"{r['ecutjy']:>7g}{r['r_cut']:>7g}{r['dE']:>12.1f}"
+              f"{r['dE']/KCAL_MEV:>15.2f}{r['dE']*2/KCAL_MEV:>16.2f}")
     return 0
 
 
