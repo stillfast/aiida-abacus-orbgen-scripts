@@ -38,6 +38,11 @@ def build_structures(cfg: dict, r_cut: float, element: str) -> dict:
     side = celldm * BOHR_TO_ANG
     centre = side / 2.0
     out = {}
+    if str(cfg.get("spill_guess", "")).lower() == "atomic":
+        # the atomic initialiser reads the monomer SCF
+        mono = StructureData(cell=[[side, 0, 0], [0, side, 0], [0, 0, side]])
+        mono.append_atom(symbols=element, position=(centre, centre, centre))
+        out[dft_folder_name(element, "monomer", 0, folder_rcut(r_cut))] = mono
     for pert in geom["pertmags"]:
         stru = StructureData(cell=[[side, 0, 0], [0, side, 0], [0, 0, side]])
         stru.append_atom(symbols=element, position=(centre, centre, centre))
