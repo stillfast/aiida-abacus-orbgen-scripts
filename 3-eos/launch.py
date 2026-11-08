@@ -33,6 +33,10 @@ def main() -> int:
     ap.add_argument("--ecutwfc", type=float, default=125.0)
     ap.add_argument("--nbands", type=int, default=80)
     ap.add_argument("--scf-thr", default="1e-7")
+    ap.add_argument("--kpoints-distance", type=float, default=0.12,
+                    help="k-point distance in 1/A.  0.12 reproduces the project's "
+                         "2-eos mesh ([19,10,11] for the alpha-U cell) and therefore "
+                         "hits its cache; the AiiDA default of 0.25 is coarser")
     ap.add_argument("--queue", default="d2_ys")
     ap.add_argument("--mem-gb", type=float, default=190.0)
     ap.add_argument("--out", default="plan.json")
@@ -46,13 +50,19 @@ def main() -> int:
                                "scf_nmax": 50, "smearing_method": "mp",
                                "smearing_sigma": 0.015, "nspin": 1},
             "scheduling": {"queue_name": args.queue,
-                           "max_memory_kb": int(args.mem_gb * 1024 * 1024)},
+                           "max_memory_kb": int(args.mem_gb * 1024 * 1024),
+                           "resources": {"num_machines": 1,
+                                         "num_mpiprocs_per_machine": 56,
+                                         "tot_num_mpiprocs": 56},
+                           "max_wallclock_seconds": 7200},
+            "kpoints_distance": args.kpoints_distance,
             "fit": "3rd-order Birch-Murnaghan"}
     Path(args.out).write_text(json.dumps(plan, indent=2))
     print(f"stage 3: equation of state with {len(args.scales)} volume points")
     print(f"  scales  : {args.scales}")
     print(f"  scf     : ecutwfc {args.ecutwfc:g} Ry, nbands {args.nbands}")
     print(f"  queue   : {args.queue}, {args.mem_gb:g} GB")
+    print(f"  kpoints : distance {args.kpoints_distance:g} 1/A")
     print(f"  fit     : {plan['fit']}")
     print(f"  wrote {args.out}")
 
@@ -65,7 +75,7 @@ def main() -> int:
 
     from aiida import load_profile
     from aiida.engine import submit
-    from aiida.orm import Dict, List, load_code, load_node
+    from aiida.orm import Dict, Float, List, load_code, load_node
     from aiida.plugins import WorkflowFactory
 
     load_profile("aiida_profile")
@@ -76,6 +86,7 @@ def main() -> int:
     builder.abacus_code = load_code(args.code)
     builder.scf_parameters = Dict(dict=plan["scf_parameters"])
     builder.scales = List(list=args.scales)
+    builder.kpoints_distance = Float(args.kpoints_distance)
     builder.scf_options = Dict(dict=plan["scheduling"])
     node = submit(builder)
     print(f"\nsubmitted {node.pk}")
