@@ -1,0 +1,297 @@
+{
+  "pw_reference_eV": {
+    "2.10": -4951.807006023504,
+    "2.40": -4952.064018093108
+  },
+  "orbgen_base": [
+    {
+      "pk": 563426,
+      "r_cut": 9.0,
+      "ecutjy": 100.0,
+      "l_max": 4,
+      "nbf_per_atom": 645,
+      "spillages": [
+        0.0113775626,
+        0.00260250578,
+        0.000500323353
+      ],
+      "orbitals": [
+        "U_gga_9au_100.0Ry_2s1p1d1f.orb",
+        "U_gga_9au_100.0Ry_4s2p2d2f1g.orb",
+        "U_gga_9au_100.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4950.720956838255,
+        "2.40": -4951.01017391832,
+        "2.80": -4949.768971466041
+      },
+      "dE_meV_per_atom": 534.97,
+      "dE_kcal_per_atom": 12.337
+    },
+    {
+      "pk": 563442,
+      "r_cut": 10.0,
+      "ecutjy": 100.0,
+      "l_max": 4,
+      "nbf_per_atom": 720,
+      "spillages": [
+        0.0113164795,
+        0.00287822755,
+        0.00057411803
+      ],
+      "orbitals": [
+        "U_gga_10au_100.0Ry_2s1p1d1f.orb",
+        "U_gga_10au_100.0Ry_4s2p2d2f1g.orb",
+        "U_gga_10au_100.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4950.81158076035,
+        "2.40": -4951.105195002578,
+        "2.80": -4949.861301228826
+      },
+      "dE_meV_per_atom": 488.56,
+      "dE_kcal_per_atom": 11.267
+    },
+    {
+      "pk": 563468,
+      "r_cut": 11.0,
+      "ecutjy": 100.0,
+      "l_max": 4,
+      "nbf_per_atom": 810,
+      "spillages": [
+        0.0111494601,
+        0.00288095166,
+        0.00058563861
+      ],
+      "orbitals": [
+        "U_gga_11au_100.0Ry_2s1p1d1f.orb",
+        "U_gga_11au_100.0Ry_4s2p2d2f1g.orb",
+        "U_gga_11au_100.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4950.814181148371,
+        "2.40": -4951.108950489797,
+        "2.80": -4949.86223385764
+      },
+      "dE_meV_per_atom": 486.97,
+      "dE_kcal_per_atom": 11.23
+    },
+    {
+      "pk": 563504,
+      "r_cut": 12.0,
+      "ecutjy": 100.0,
+      "l_max": 4,
+      "nbf_per_atom": 885,
+      "spillages": [
+        0.0110297249,
+        0.00288126013,
+        0.000620502967
+      ],
+      "orbitals": [
+        "U_gga_12au_100.0Ry_2s1p1d1f.orb",
+        "U_gga_12au_100.0Ry_4s2p2d2f1g.orb",
+        "U_gga_12au_100.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4950.766515708128,
+        "2.40": -4951.062204372379,
+        "2.80": -4949.810250477123
+      },
+      "dE_meV_per_atom": 510.58,
+      "dE_kcal_per_atom": 11.774
+    },
+    {
+      "pk": 563549,
+      "r_cut": 9.0,
+      "ecutjy": 125.0,
+      "l_max": 4,
+      "nbf_per_atom": 735,
+      "spillages": [
+        0.0112644292,
+        0.00260906823,
+        0.000502628189
+      ],
+      "orbitals": [
+        "U_gga_9au_125.0Ry_2s1p1d1f.orb",
+        "U_gga_9au_125.0Ry_4s2p2d2f1g.orb",
+        "U_gga_9au_125.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.391447198602,
+        "2.40": -4951.664713791249,
+        "2.80": -4950.430862388611
+      },
+      "dE_meV_per_atom": 203.72,
+      "dE_kcal_per_atom": 4.698
+    },
+    {
+      "pk": 563591,
+      "r_cut": 10.0,
+      "ecutjy": 125.0,
+      "l_max": 4,
+      "nbf_per_atom": 820,
+      "spillages": [
+        0.011251187,
+        0.00289155136,
+        0.000565165875
+      ],
+      "orbitals": [
+        "U_gga_10au_125.0Ry_2s1p1d1f.orb",
+        "U_gga_10au_125.0Ry_4s2p2d2f1g.orb",
+        "U_gga_10au_125.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.601517175834,
+        "2.40": -4951.875816473879,
+        "2.80": -4950.646086570072
+      },
+      "dE_meV_per_atom": 98.42,
+      "dE_kcal_per_atom": 2.27
+    },
+    {
+      "pk": 563620,
+      "r_cut": 11.0,
+      "ecutjy": 125.0,
+      "l_max": 4,
+      "nbf_per_atom": 910,
+      "spillages": [
+        0.0110750232,
+        0.00289185387,
+        0.000577307201
+      ],
+      "orbitals": [
+        "U_gga_11au_125.0Ry_2s1p1d1f.orb",
+        "U_gga_11au_125.0Ry_4s2p2d2f1g.orb",
+        "U_gga_11au_125.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.653525198415,
+        "2.40": -4951.926206559506,
+        "2.80": -4950.694219412865
+      },
+      "dE_meV_per_atom": 72.82,
+      "dE_kcal_per_atom": 1.679
+    },
+    {
+      "pk": 562761,
+      "r_cut": 12.0,
+      "ecutjy": 125.0,
+      "l_max": 4,
+      "nbf_per_atom": 995,
+      "spillages": [
+        0.0109833775,
+        0.00289936232,
+        0.000590906697
+      ],
+      "orbitals": [
+        "U_gga_12au_125Ry_2s1p1d1f.orb",
+        "U_gga_12au_125Ry_4s2p2d2f1g.orb",
+        "U_gga_12au_125Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.703588983613,
+        "2.40": -4951.974437290984,
+        "2.80": -4950.741559958346
+      },
+      "dE_meV_per_atom": 48.25,
+      "dE_kcal_per_atom": 1.113
+    },
+    {
+      "pk": 563677,
+      "r_cut": 9.0,
+      "ecutjy": 150.0,
+      "l_max": 4,
+      "nbf_per_atom": 810,
+      "spillages": [
+        0.0116061781,
+        0.00293101716,
+        0.000564364059
+      ],
+      "orbitals": [
+        "U_gga_9au_150.0Ry_2s1p1d1f.orb",
+        "U_gga_9au_150.0Ry_4s2p2d2f1g.orb",
+        "U_gga_9au_150.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.458348035278,
+        "2.40": -4951.731905677636,
+        "2.80": -4950.501549691516
+      },
+      "dE_meV_per_atom": 170.19,
+      "dE_kcal_per_atom": 3.925
+    },
+    {
+      "pk": 563741,
+      "r_cut": 10.0,
+      "ecutjy": 150.0,
+      "l_max": 4,
+      "nbf_per_atom": 904,
+      "spillages": [
+        0.0112546506,
+        0.00289222571,
+        0.000567216443
+      ],
+      "orbitals": [
+        "U_gga_10au_150.0Ry_2s1p1d1f.orb",
+        "U_gga_10au_150.0Ry_4s2p2d2f1g.orb",
+        "U_gga_10au_150.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.643320861179,
+        "2.40": -4951.917347684349,
+        "2.80": -4950.689278337128
+      },
+      "dE_meV_per_atom": 77.59,
+      "dE_kcal_per_atom": 1.789
+    },
+    {
+      "pk": 563778,
+      "r_cut": 11.0,
+      "ecutjy": 150.0,
+      "l_max": 4,
+      "nbf_per_atom": 995,
+      "spillages": [
+        0.0110739132,
+        0.00289327641,
+        0.000574585935
+      ],
+      "orbitals": [
+        "U_gga_11au_150.0Ry_2s1p1d1f.orb",
+        "U_gga_11au_150.0Ry_4s2p2d2f1g.orb",
+        "U_gga_11au_150.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.720814297692,
+        "2.40": -4951.993147758739,
+        "2.80": -4950.763937344354
+      },
+      "dE_meV_per_atom": 39.27,
+      "dE_kcal_per_atom": 0.905
+    },
+    {
+      "pk": 564014,
+      "r_cut": 12.0,
+      "ecutjy": 150.0,
+      "l_max": 4,
+      "nbf_per_atom": 1095,
+      "spillages": [
+        0.0109832273,
+        0.0029019361,
+        0.000592638836
+      ],
+      "orbitals": [
+        "U_gga_12au_150.0Ry_2s1p1d1f.orb",
+        "U_gga_12au_150.0Ry_4s2p2d2f1g.orb",
+        "U_gga_12au_150.0Ry_6s3p3d3f2g.orb"
+      ],
+      "scf_energies_eV": {
+        "2.10": -4951.752411435676,
+        "2.40": -4952.023156127963,
+        "2.80": -4950.792471322021
+      },
+      "dE_meV_per_atom": 23.86,
+      "dE_kcal_per_atom": 0.55
+    }
+  ],
+  "eos": []
+}
