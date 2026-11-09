@@ -44,9 +44,13 @@ def main() -> int:
                 if type(child).__name__ != "CalcJobNode":
                     continue
                 elapsed = (child.mtime - child.ctime).total_seconds()
+                cached = bool(child.base.caching.is_created_from_cache)
+                # a cached node never ran: its ctime is the moment it was cloned from
+                # the original, so an elapsed time of ~0 says nothing about cost
                 rows.append({"ecutjy_Ry": s["ecutjy"], "r_cut_AU": s["r_cut"],
                              "geometry": child.label.replace("scf-", ""),
-                             "elapsed_s": int(elapsed),
+                             "cached": int(cached),
+                             "elapsed_s": "" if cached else int(elapsed),
                              "n_scf_steps": "",
                              "workchain_pk": wc.pk, "calcjob_pk": child.pk})
     rows.sort(key=lambda r: (r["ecutjy_Ry"], r["r_cut_AU"], r["geometry"]))
@@ -56,6 +60,9 @@ def main() -> int:
     with out.open("w", newline="") as handle:
         handle.write("# Wall time of every primitive-basis SCF of the (r_cut, ecutjy) scan.\n")
         handle.write("# elapsed_s = mtime - ctime of the CalcJobNode, so it includes queue wait.\n")
+        handle.write("# cached=1 means the node was cloned from an earlier run, so it never\n")
+        handle.write("# executed and elapsed_s is left empty on purpose.  Only cached=0 rows\n")
+        handle.write("# can support a cost argument.\n")
         handle.write("# n_scf_steps is not parsed yet; leave it empty rather than guess.\n")
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]) if rows else
                                 ["ecutjy_Ry", "r_cut_AU", "geometry", "elapsed_s",
