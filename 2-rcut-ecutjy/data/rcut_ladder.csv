@@ -1,0 +1,12 @@
+# r_cut ladder: primitive (TSW) basis vs plane waves at l_max=4, ecutjy=150 Ry.
+# Reference = r_cut 12 au; deviations are "+mean/-max" over the three reference
+# geometries (U2 dimers at 2.10, 2.40, 2.80 A in a 35 Bohr cell).
+# Source: project/u_14ve/rcut/README.md, PKs 468364/468415/468457/468485/468557.
+# NOTE: this table quotes the error per U2 DIMER, unlike tsw_vs_pw.csv which is
+# per atom.  1 kcal/mol per dimer = 43.364 meV/dimer = 21.68 meV/atom.
+r_cut_AU,dE_mean_2.10_meV_per_atom,dE_max_2.10_meV_per_atom,dE_mean_2.40_meV_per_atom,dE_max_2.40_meV_per_atom,dE_mean_2.80_meV_per_atom,dE_max_2.80_meV_per_atom,verdict,note
+8,380,432,387,420,398,397,fail,r_cut 8 au = 4.23 A barely brackets the bond
+9,147,146,146,149,146,149,fail,
+10,55,47,53,51,52,53,marginal,close to the 1 kcal/mol line
+11,16,12,15,13,14,15,pass,
+12,0,0,0,0,0,0,reference,

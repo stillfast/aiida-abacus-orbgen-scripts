@@ -1,0 +1,6 @@
+# ecutjy ladder at r_cut 12 au, l_max 4; reference = 150 Ry.
+# Source: project/u_14ve/ecutjy/README.md, PKs 468769 (125 Ry), 468738 (100 Ry).
+ecutjy_Ry,bl_2.10_mean_meV,bl_2.10_max_meV,bl_2.40_mean_meV,bl_2.40_max_meV,bl_2.80_mean_meV,bl_2.80_max_meV,verdict,note
+100,,,,,,,,fail,"2.10 A point hung and was killed after 11 h; the r_cut 10 series shows ~0.5 eV/atom at 100 Ry"
+125,24,7,24,7,26,5,pass,
+150,0,0,0,0,0,0,reference,

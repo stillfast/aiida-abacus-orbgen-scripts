@@ -1,0 +1,10 @@
+# Basis selection for alpha-U: eta, eta10, V0 and B0 against plane waves.
+# PWs are the reference; V0/B0 come from the four teal EOS fits in
+# bcc_uranium/aiida-uranium-alpha/2-eos/reports (PKs in its output.json).
+# eta and eta10 are at the equilibrium volume; eta10 is valid because those runs
+# used 80 bands, i.e. 25.3 eV of spectrum above eps_F (>> the 10 eV lift).
+basis,orbital,V0_per_atom_A3,dV0_pct,B0_GPa,dB0_pct,BP,E0_per_atom_eV,dE_meV_per_atom,eta_meV,eta10_meV,verdict,note
+PW,,20.0916,0.000,202.34,0.00,8.51,-2481.4847,0.0,,,reference,plane waves
+SZ,U_gga_12au_125Ry_2s1p1d1f.orb,20.3976,1.523,173.82,-14.09,11.08,-2480.5042,980.5,113.17,178.49,fail,"eta and B0 both far off; B0' also distorted (11.08 vs 8.51)"
+DZP,U_gga_12au_125Ry_4s2p2d2f1g.orb,20.1210,0.146,204.45,1.05,8.78,-2481.4071,77.6,8.10,25.18,pass_structure_fail_energy,"eta, V0 and B0 all fine; eta10 and the total energy are not"
+TZDP,U_gga_12au_125Ry_6s3p3d3f2g.orb,20.1136,0.109,201.07,-0.62,8.62,-2481.4408,43.9,4.41,12.69,pass,"43.9 meV/atom is right at chemical accuracy (43.364)"

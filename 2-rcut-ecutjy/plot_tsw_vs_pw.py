@@ -80,13 +80,49 @@ def collect(pw_refs: dict[str, float]) -> list[dict]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="tsw_vs_pw.png")
+    ap.add_argument("--from-csv", default=None,
+                    help="plot from a saved CSV instead of querying AiiDA, so the "
+                         "figure is reproducible without the database")
+    ap.add_argument("--csv-out", default=None,
+                    help="also write the collected points to this CSV")
     args = ap.parse_args()
 
     pw = {"2.10": -4951.807006023504, "2.40": -4952.064018093108}   # ecutwfc 180
-    rows = collect(pw)
+    if args.from_csv:
+        import csv
+        rows = []
+        with Path(args.from_csv).open() as handle:
+            for row in csv.DictReader(r for r in handle if not r.startswith("#")):
+                rows.append({"ecutjy": float(row["ecutjy_Ry"]),
+                             "r_cut": float(row["r_cut_AU"]),
+                             "dE": float(row["dE_meV_per_atom"]),
+                             "pk": row.get("pk", "")})
+        print(f"read {len(rows)} points from {args.from_csv}")
+    else:
+        rows = collect(pw)
     if not rows:
         print("no finished points")
         return 2
+
+    if args.csv_out:
+        import csv
+        out_csv = Path(args.csv_out)
+        out_csv.parent.mkdir(parents=True, exist_ok=True)
+        with out_csv.open("w", newline="") as handle:
+            # comments are written as plain text, not through csv.writer, so that a
+            # reader can simply skip every line that starts with '#'
+            handle.write("# TSW (primitive NSW basis) vs plane waves, ecutwfc 180 Ry.\n")
+            handle.write("# dE is per atom; the 1 kcal/mol bar is 43.364 meV/atom.\n")
+            handle.write("# PW reference: 2.10 A = -4951.807006023504 eV, "
+                         "2.40 A = -4952.064018093108 eV\n")
+            handle.write("# pk = the abacus.orbgen.base workchain.\n")
+            writer = csv.writer(handle)
+            writer.writerow(["ecutjy_Ry", "r_cut_AU",
+                             "dE_meV_per_atom", "dE_kcal_per_atom", "pk"])
+            for r in sorted(rows, key=lambda x: (x["ecutjy"], x["r_cut"])):
+                writer.writerow([f"{r['ecutjy']:g}", f"{r['r_cut']:g}",
+                                 f"{r['dE']:.2f}", f"{r['dE']/KCAL_MEV:.3f}", r["pk"]])
+        print(f"wrote {out_csv}")
 
     plt.rcParams.update({
         "font.family": "DejaVu Sans", "font.size": 11,

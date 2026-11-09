@@ -1,0 +1,6 @@
+# l_max ladder at r_cut 12 au, ecutjy 150 Ry; reference = l_max 4.
+# Source: project/u_14ve/lmax/README.md, PKs 468814 (l=3), 468883 (l=5, failed).
+l_max,bl_2.10_mean_meV,bl_2.10_max_meV,bl_2.40_mean_meV,bl_2.40_max_meV,bl_2.80_mean_meV,bl_2.80_max_meV,verdict,note
+3,33,66,22,43,13,26,fail,bond-length dependent; worst 66 meV
+4,0,0,0,0,0,0,reference,
+5,,,,,,,,untested,"every run failed with exit 301 (memory / wall-time); kept as a record"
