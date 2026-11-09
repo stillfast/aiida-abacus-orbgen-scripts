@@ -12,3 +12,8 @@ venv/
 htmlcov/
 .DS_Store
 demo/plan*.json
+
+# AiiDA archives are far too large for git (631 MB for this campaign).
+# Regenerate with: python export_vs_pw.py && python export_data.py
+# Or attach campaign.aiida to a GitHub release instead.
+*.aiida

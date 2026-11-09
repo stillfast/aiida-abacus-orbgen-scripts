@@ -1,8 +1,9 @@
-# l_max ladder at fixed r_cut 12 au / ecutjy 150 Ry / ecutwfc 180 Ry.
-# Same criterion: the atomization energy difference against l_max 4, |dA| < 0.05 eV.
-# Cells are dE_per_atom / dA in meV.
-# Source: project/u_14ve/lmax/README.md, PKs 468814 (l=3), 468883 (l=5, failed).
-l_max,bl_2.10_dE_per_atom_meV,bl_2.10_dA_meV,bl_2.40_dE_per_atom_meV,bl_2.40_dA_meV,bl_2.80_dE_per_atom_meV,bl_2.80_dA_meV,verdict,note
-3,33,66,22,43,13,26,fail,"bond-length dependent; the error is amplified (kappa ~ 2), worst 66 meV"
-4,0,0,0,0,0,0,reference,
-5,,,,,,,untested,every run failed with exit 301 (memory / wall time) even on the large-memory nodes
+# lmax ladder in the SAME convention as tsw_vs_pw.csv:
+# |E_LCAO - E_PW| per atom, meV.  1 kcal/mol = 43.364 meV/atom.
+# PW reference at ecutwfc 180 Ry, 35 Bohr cell:
+#   2.10 A = -4951.807006023504 eV,  2.40 A = -4952.064018093108 eV
+# Only the 2.10/2.40 A geometries have a PW run, so the 2.80 A
+# column of the old tables is not reproduced here.
+label,pk,r_cut_AU,ecutjy_Ry,l_max,dE_2.10_meV_per_atom,dE_2.40_meV_per_atom
+3,468814,12,150,3,60.3,42.0
+4,468557,12,150,4,27.3,20.4

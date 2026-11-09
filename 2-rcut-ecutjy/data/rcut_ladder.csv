@@ -1,15 +1,12 @@
-# r_cut ladder at fixed l_max 4 / ecutjy 150 Ry / ecutwfc 180 Ry.
-# Criterion is NOT the error against plane waves: it is the atomization energy
-#     A = E(U2) - 2 E(U)
-# and the value quoted is |A(r_cut) - A(12 au)|.  Stop rule: |dA| < 0.05 eV (50 meV).
-# Each cell holds two numbers, exactly as the source table does:
-#     dE_per_atom  -- the energy difference per atom, meV
-#     dA           -- the atomization-energy difference, meV (this is the verdict)
-# Source: project/u_14ve/rcut/README.md, PKs 468364/468415/468457/468485/468557.
-# Note: r_cut is in Bohr (8 au = 4.23 A), the bond lengths are in Angstrom.
-r_cut_AU,bl_2.10_dE_per_atom_meV,bl_2.10_dA_meV,bl_2.40_dE_per_atom_meV,bl_2.40_dA_meV,bl_2.80_dE_per_atom_meV,bl_2.80_dA_meV,verdict,note
-8,380,432,387,420,398,397,fail,"8 au = 4.23 A cuts the tail before the bonding region; 380-400 meV/atom"
-9,147,146,146,149,146,149,fail,"still ~150 meV, three times the 50 meV bar"
-10,55,47,53,51,52,53,marginal,"the README calls this 50 meV 压线: it sits right on the bar"
-11,16,12,15,13,14,15,pass,
-12,0,0,0,0,0,0,reference,
+# rcut ladder in the SAME convention as tsw_vs_pw.csv:
+# |E_LCAO - E_PW| per atom, meV.  1 kcal/mol = 43.364 meV/atom.
+# PW reference at ecutwfc 180 Ry, 35 Bohr cell:
+#   2.10 A = -4951.807006023504 eV,  2.40 A = -4952.064018093108 eV
+# Only the 2.10/2.40 A geometries have a PW run, so the 2.80 A
+# column of the old tables is not reproduced here.
+label,pk,r_cut_AU,ecutjy_Ry,l_max,dE_2.10_meV_per_atom,dE_2.40_meV_per_atom
+8,468364,8,150,4,407.7,406.9
+9,468415,9,150,4,174.3,166.1
+10,468457,10,150,4,81.8,73.3
+11,468485,11,150,4,43.1,35.4
+12,468557,12,150,4,27.3,20.4
