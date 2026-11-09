@@ -37,8 +37,8 @@ check that the pooling is sound.
 
 | file | rows | grid |
 |---|---|---|
-| `tsw_vs_pw.csv` | 13 | r_cut 8-12 x ecutjy 150, r_cut 9-12 x ecutjy 100/125 |
-| `rcut_ladder.csv` | 5 | r_cut 8-12 at ecutjy 150, l_max 4 |
+| `tsw_vs_pw.csv` | 12 | r_cut 9-12 x ecutjy 100/125/150 |
+| `rcut_ladder.csv` | 4 | r_cut 9-12 at ecutjy 150, l_max 4 |
 | `ecutjy_ladder.csv` | 3 | ecutjy 100/125/150 at r_cut 12 |
 | `lmax_ladder.csv` | 2 | l_max 3/4 at r_cut 12, ecutjy 150 |
 | `timings.csv` | 52 | wall time per primitive-basis SCF |

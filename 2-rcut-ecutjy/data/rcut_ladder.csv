@@ -5,7 +5,6 @@
 # Only the 2.10/2.40 A geometries have a PW run, so the 2.80 A
 # column of the old tables is not reproduced here.
 label,pk,r_cut_AU,ecutjy_Ry,l_max,dE_2.10_meV_per_atom,dE_2.40_meV_per_atom
-8,468364,8,150,4,407.7,406.9
 9,468415,9,150,4,174.3,166.1
 10,468457,10,150,4,81.8,73.3
 11,468485,11,150,4,43.1,35.4

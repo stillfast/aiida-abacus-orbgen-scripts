@@ -2,9 +2,6 @@
 # dE is per atom; the 1 kcal/mol bar is 43.364 meV/atom.
 # PW reference: 2.10 A = -4951.807006023504 eV, 2.40 A = -4952.064018093108 eV
 # pk = the abacus.orbgen.base workchain.
-# The r_cut=8 point (PK 468364) is reused from the earlier LCAO-only ladder:
-# its r_cut 9-12 siblings reproduce this scan's (ecutjy 150) numbers to
-# 0.1 meV, so the two campaigns are the same physics and can be pooled.
 ecutjy_Ry,r_cut_AU,dE_meV_per_atom,dE_kcal_per_atom,pk
 100,9,534.97,12.337,563426
 100,10,488.56,11.267,563442
@@ -14,7 +11,6 @@ ecutjy_Ry,r_cut_AU,dE_meV_per_atom,dE_kcal_per_atom,pk
 125,10,98.42,2.270,563591
 125,11,72.82,1.679,563620
 125,12,48.25,1.113,562761
-150,8,407.30,9.393,468364
 150,9,170.19,3.925,563677
 150,10,77.59,1.789,563741
 150,11,39.27,0.905,563778
