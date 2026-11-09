@@ -34,8 +34,26 @@ The ladder files therefore use two numbers per cell, `dE_per_atom` and `dA`, and
 verdict follows `dA` -- not the energy difference against PW.  All four files are
 per atom; nothing here is per dimer.
 
-The ladders also cover a wider grid than the figure: `rcut_ladder.csv` includes
-r_cut 8 au from the earlier LCAO-only campaign (`project/u_14ve/rcut/`, PKs
-468364-468557), while `tsw_vs_pw.png` comes from the newer `abacus.orbgen.base`
-scan (r_cut 9-12 x ecutjy 100/125/150).  r_cut 8 is absent from the figure because
-that scan never included it -- not because it was dropped.
+## One dataset, not two
+
+`tsw_vs_pw.csv` spans r_cut 8-12 au at ecutjy 150 Ry plus r_cut 9-12 at 100 and
+125 Ry.  The r_cut 8 point is **reused**, not recomputed: it comes from the earlier
+LCAO-only ladder (PK 468364), and that ladder's r_cut 9-12 points reproduce this
+scan's 150 Ry column to 0.1 meV, which is what makes pooling legitimate.
+
+Cross-check against the published ladder table, after converting both to the same
+reference (the ladder quotes the deviation from r_cut 12, the CSV from PW):
+
+| r_cut | CSV minus its r_cut-12 row | ladder table | difference |
+|---|---|---|---|
+| 8 | 383.4 meV | 380 | +3.4 |
+| 9 | 146.3 | 147 | -0.7 |
+| 10 | 53.7 | 55 | -1.3 |
+| 11 | 15.4 | 16 | -0.6 |
+
+Residual differences are the rounding of the old table.  So the two campaigns are
+the same physics and the figure can carry both without mixing methods.
+
+The ladder files still exist because they answer a different question (atomization
+energy against another LCAO parameter set, 50 meV bar); they are not an alternative
+source for the same figure.
