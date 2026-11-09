@@ -20,14 +20,22 @@ python 2-rcut-ecutjy/plot_tsw_vs_pw.py --from-csv 2-rcut-ecutjy/data/tsw_vs_pw.c
 `--from-csv` never imports AiiDA.  Regenerate the CSV from the database with
 `--csv-out`, or re-export the ladder data with `export_data.py`.
 
-## Unit conventions -- read before quoting a number
+## Two different criteria live in this directory -- do not mix them
 
-Two conventions are in circulation and they differ by a factor of two:
+`tsw_vs_pw.csv` and the three ladder files answer different questions, against
+different references.
 
-* `tsw_vs_pw.csv` is **per atom**; 1 kcal/mol = **43.364 meV/atom**.
-* `rcut_ladder.csv`, `ecutjy_ladder.csv` and `lmax_ladder.csv` come from the older
-  project tables, which quoted the error **per U2 dimer**; there 1 kcal/mol =
-  43.364 meV/dimer = **21.68 meV/atom**.
+| file | reference | quantity | bar |
+|---|---|---|---|
+| `tsw_vs_pw.csv` | plane waves | \|E_TSW - E_PW\| **per atom** | 43.364 meV/atom (1 kcal/mol) |
+| `rcut/ecutjy/lmax_ladder.csv` | another **LCAO** parameter set | \|A(p) - A(ref)\| of the **atomization energy** `A = E(U2) - 2 E(U)` | 50 meV (0.05 eV) |
 
-Do not mix the two: a 24 meV value means "passes comfortably" under the per-atom
-convention and "marginal" under the per-dimer one.
+The ladder files therefore use two numbers per cell, `dE_per_atom` and `dA`, and the
+verdict follows `dA` -- not the energy difference against PW.  All four files are
+per atom; nothing here is per dimer.
+
+The ladders also cover a wider grid than the figure: `rcut_ladder.csv` includes
+r_cut 8 au from the earlier LCAO-only campaign (`project/u_14ve/rcut/`, PKs
+468364-468557), while `tsw_vs_pw.png` comes from the newer `abacus.orbgen.base`
+scan (r_cut 9-12 x ecutjy 100/125/150).  r_cut 8 is absent from the figure because
+that scan never included it -- not because it was dropped.

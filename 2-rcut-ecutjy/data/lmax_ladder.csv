@@ -1,6 +1,8 @@
-# l_max ladder at r_cut 12 au, ecutjy 150 Ry; reference = l_max 4.
+# l_max ladder at fixed r_cut 12 au / ecutjy 150 Ry / ecutwfc 180 Ry.
+# Same criterion: the atomization energy difference against l_max 4, |dA| < 0.05 eV.
+# Cells are dE_per_atom / dA in meV.
 # Source: project/u_14ve/lmax/README.md, PKs 468814 (l=3), 468883 (l=5, failed).
-l_max,bl_2.10_mean_meV,bl_2.10_max_meV,bl_2.40_mean_meV,bl_2.40_max_meV,bl_2.80_mean_meV,bl_2.80_max_meV,verdict,note
-3,33,66,22,43,13,26,fail,bond-length dependent; worst 66 meV
+l_max,bl_2.10_dE_per_atom_meV,bl_2.10_dA_meV,bl_2.40_dE_per_atom_meV,bl_2.40_dA_meV,bl_2.80_dE_per_atom_meV,bl_2.80_dA_meV,verdict,note
+3,33,66,22,43,13,26,fail,"bond-length dependent; the error is amplified (kappa ~ 2), worst 66 meV"
 4,0,0,0,0,0,0,reference,
-5,,,,,,,,untested,"every run failed with exit 301 (memory / wall-time); kept as a record"
+5,,,,,,,untested,every run failed with exit 301 (memory / wall time) even on the large-memory nodes

@@ -1,12 +1,15 @@
-# r_cut ladder: primitive (TSW) basis vs plane waves at l_max=4, ecutjy=150 Ry.
-# Reference = r_cut 12 au; deviations are "+mean/-max" over the three reference
-# geometries (U2 dimers at 2.10, 2.40, 2.80 A in a 35 Bohr cell).
+# r_cut ladder at fixed l_max 4 / ecutjy 150 Ry / ecutwfc 180 Ry.
+# Criterion is NOT the error against plane waves: it is the atomization energy
+#     A = E(U2) - 2 E(U)
+# and the value quoted is |A(r_cut) - A(12 au)|.  Stop rule: |dA| < 0.05 eV (50 meV).
+# Each cell holds two numbers, exactly as the source table does:
+#     dE_per_atom  -- the energy difference per atom, meV
+#     dA           -- the atomization-energy difference, meV (this is the verdict)
 # Source: project/u_14ve/rcut/README.md, PKs 468364/468415/468457/468485/468557.
-# NOTE: this table quotes the error per U2 DIMER, unlike tsw_vs_pw.csv which is
-# per atom.  1 kcal/mol per dimer = 43.364 meV/dimer = 21.68 meV/atom.
-r_cut_AU,dE_mean_2.10_meV_per_atom,dE_max_2.10_meV_per_atom,dE_mean_2.40_meV_per_atom,dE_max_2.40_meV_per_atom,dE_mean_2.80_meV_per_atom,dE_max_2.80_meV_per_atom,verdict,note
-8,380,432,387,420,398,397,fail,r_cut 8 au = 4.23 A barely brackets the bond
-9,147,146,146,149,146,149,fail,
-10,55,47,53,51,52,53,marginal,close to the 1 kcal/mol line
+# Note: r_cut is in Bohr (8 au = 4.23 A), the bond lengths are in Angstrom.
+r_cut_AU,bl_2.10_dE_per_atom_meV,bl_2.10_dA_meV,bl_2.40_dE_per_atom_meV,bl_2.40_dA_meV,bl_2.80_dE_per_atom_meV,bl_2.80_dA_meV,verdict,note
+8,380,432,387,420,398,397,fail,"8 au = 4.23 A cuts the tail before the bonding region; 380-400 meV/atom"
+9,147,146,146,149,146,149,fail,"still ~150 meV, three times the 50 meV bar"
+10,55,47,53,51,52,53,marginal,"the README calls this 50 meV 压线: it sits right on the bar"
 11,16,12,15,13,14,15,pass,
 12,0,0,0,0,0,0,reference,
