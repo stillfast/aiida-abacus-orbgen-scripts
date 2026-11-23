@@ -78,10 +78,11 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(rows)
     print(f"wrote {out} ({len(rows)} rows)")
-    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'min':>9}{'dE meV/at':>12}{'kcal/at':>9}{'verdict':>9}")
+    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'min':>9}{'mean3 meV/at':>14}"
+          f"{'monomer':>9}{'kcal/at':>9}{'verdict':>9}")
     for r in rows:
         print(f"{r['ecutjy_Ry']:>7}{r['r_cut_AU']:>7}{r['total_wall_min']:>9.1f}"
-              f"{r['dE_mean3_meV_per_atom']:>12}{r['dE_monomer_meV_per_atom']:>9}"
+              f"{r['dE_mean3_meV_per_atom']:>14}{r['dE_monomer_meV_per_atom']:>9}"
               f"{r['dE_mean3_kcal_per_atom']:>9}{r['verdict']:>9}")
     return 0
 
