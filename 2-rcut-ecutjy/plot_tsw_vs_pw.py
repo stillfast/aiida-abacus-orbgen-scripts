@@ -54,7 +54,7 @@ def main() -> int:
     for r in rows:
         points.append({
             "ecutjy": float(r["ecutjy_Ry"]), "r_cut": float(r["r_cut_AU"]),
-            "mean3": numeric(r, "dE_mean3_meV_per_atom"),
+            "mean4": numeric(r, "dE_mean4_meV_per_atom"),
             "monomer": numeric(r, "dE_monomer_meV_per_atom"),
             "per_geom": {g: numeric(r, f"dE_{g}_meV_per_atom") for g in GEOMS},
             "pk": r.get("workchain_pk", ""),
@@ -72,20 +72,19 @@ def main() -> int:
     for e in sorted({p["ecutjy"] for p in points}):
         sel = sorted([p for p in points if p["ecutjy"] == e], key=lambda p: p["r_cut"])
         colour, marker = STYLE.get(e, ("k", "o"))
-        ax.plot([p["r_cut"] for p in sel], [p["mean3"] for p in sel], "-",
+        ax.plot([p["r_cut"] for p in sel], [p["mean4"] for p in sel], "-",
                 color=colour, lw=1.6, marker=marker, ms=7, mfc="white", mew=1.5,
-                label=rf"$E_{{\rm cut}}^{{\rm jY}}$ = {e:g} Ry, 3-dimer mean")
-        mono = [(p["r_cut"], p["monomer"]) for p in sel if p["monomer"] is not None]
-        if len(mono) == len(sel):
-            ax.plot([m[0] for m in mono], [m[1] for m in mono], "--",
-                    color=colour, lw=1.1, alpha=0.75, marker=marker, ms=5,
-                    mfc="none", mew=1.1)
+                label=rf"$E_{{\rm cut}}^{{\rm jY}}$ = {e:g} Ry")
+        for p in sel:
+            ax.annotate(f"{p['mean4']:g}", (p["r_cut"], p["mean4"]),
+                        textcoords="offset points", xytext=(0, 9), ha="center",
+                        fontsize=7.5, color=colour)
     ax.axhline(KCAL, color="0.25", ls="--", lw=1.1)
     ax.annotate(r"1 kcal/mol = 43.4 meV/atom", xy=(8.7, KCAL), xytext=(0, 5),
                 textcoords="offset points", fontsize=9, color="0.15")
     ax.set_xlabel(r"$r_{\rm cut}$  (a.u.)")
     ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom)")
-    ax.set_title("solid: mean of the 3 dimers   dashed: monomer", fontsize=10)
+    ax.set_title("mean over all four reference geometries", fontsize=10)
     ax.set_xticks([9, 10, 11, 12])
     ax.legend(loc="upper right", fontsize=8.5, handlelength=1.8)
     ax.grid(alpha=0.25)
@@ -119,13 +118,12 @@ def main() -> int:
     print(f"wrote {out}")
 
     print(f"\n{'ecutjy':>7}{'r_cut':>7}{'2.10':>9}{'2.40':>9}{'2.80':>9}"
-          f"{'mean3':>9}{'monomer':>10}{'kcal/at':>9}")
+          f"{'monomer':>9}{'mean4':>9}{'kcal/at':>9}")
     for p in sorted(points, key=lambda x: (x["ecutjy"], x["r_cut"])):
         f = p["per_geom"]
         print(f"{p['ecutjy']:>7g}{p['r_cut']:>7g}"
               f"{f['2.10']:>9.1f}{f['2.40']:>9.1f}{f['2.80']:>9.1f}"
-              f"{p['mean3']:>9.1f}{(p['monomer'] if p['monomer'] else float('nan')):>10.1f}"
-              f"{p['mean3']/KCAL:>9.2f}")
+              f"{p['monomer']:>9.1f}{p['mean4']:>9.1f}{p['mean4']/KCAL:>9.2f}")
     return 0
 
 

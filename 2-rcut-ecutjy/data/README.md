@@ -44,11 +44,13 @@ difference from the NAO side is the basis.
 | U2 2.80 A | -4950.826505580118 | 580303 |
 | monomer | -2473.881319189626 | 580305 |
 
-`dE_mean3` is the mean over the **three dimers** and is what the figure and
-`cost_vs_accuracy.csv` use.  `dE_monomer` is reported separately on purpose: the
-monomer carries the `r_cut` error without cancellation (kappa ~ 1), so folding it into
-the dimer mean would hide the very thing that makes `r_cut` need 11 au.
+`dE_mean4` is the headline: the mean over **all four** reference geometries, with the
+monomer weighted the same as each dimer.  Those four structures are exactly what the
+orbital generator fits against, so the average describes the product rather than one
+particular bond length.  `dE_mean3` (dimers only) is kept because it is what the older
+tables quoted.
 
+| ecutjy | r_cut | 2.10 | 2.40 | 2.80 | monomer | **mean4** |
 | ecutjy | r_cut | 2.10 | 2.40 | 2.80 | mean3 | **monomer** |
 |---|---:|---:|---:|---:|---:|---:|
 | 125 | 12 | 51.71 | 44.79 | 42.47 | 46.32 | 47.86 |

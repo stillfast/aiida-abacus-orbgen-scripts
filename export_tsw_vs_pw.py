@@ -92,12 +92,23 @@ def main() -> int:
             if not all(g in d for g in GEOMETRIES):
                 continue
             mean3 = sum(d[g] for g in GEOMETRIES) / len(GEOMETRIES)
+            # headline: mean over ALL FOUR reference geometries, the monomer given the
+            # same weight as each dimer.  Those four structures are exactly what the
+            # orbital generator fits against, so the average describes the product.
+            all4 = [d[g] for g in GEOMETRIES if g in d]
+            if "monomer" in d:
+                all4.append(d["monomer"])
+            mean4 = sum(all4) / len(all4) if len(all4) == 4 else None
             rows.append({
                 "ecutjy_Ry": f"{s['ecutjy']:g}", "r_cut_AU": f"{s['r_cut']:g}",
                 **{f"dE_{g}_meV_per_atom": round(d[g], 2) for g in GEOMETRIES},
                 "dE_monomer_meV_per_atom": round(d["monomer"], 2) if "monomer" in d else "",
                 "dE_mean3_meV_per_atom": round(mean3, 2),
                 "dE_mean3_kcal_per_atom": round(mean3 / KCAL, 3),
+                "dE_mean4_meV_per_atom": (round(mean4, 2)
+                                          if mean4 is not None else ""),
+                "dE_mean4_kcal_per_atom": (round(mean4 / KCAL, 3)
+                                           if mean4 is not None else ""),
                 "workchain_pk": wc.pk,
             })
     rows.sort(key=lambda r: (float(r["ecutjy_Ry"]), float(r["r_cut_AU"])))
@@ -109,7 +120,9 @@ def main() -> int:
         handle.write("# Same 35 Bohr (18.5212 A) cubic cell, same pseudopotential\n")
         handle.write("# (U.pbe-n-nc.UPF), ecutwfc 180 Ry, gamma_only.  Only the basis differs.\n")
         handle.write("# dE = (E_TSW - E_PW) / n_atoms, meV/atom.  The headline number is\n")
-        handle.write("# dE_mean3, the mean over the three DIMERS; the monomer is separate\n")
+        handle.write("# dE_mean4 is the headline: the mean over all four geometries,\n")
+        handle.write("# the monomer weighted the same as each dimer.  dE_mean3 (dimers\n")
+        handle.write("# only) is kept for comparison with the older tables.\n")
         handle.write("# because its r_cut error does not cancel (kappa ~ 1).\n")
         handle.write("# PW (eV): 2.10 = -4951.807006023504, 2.40 = -4952.064018093108,\n")
         handle.write("#          2.80 = -4950.826505580118, monomer = -2473.881319189626\n")
@@ -118,12 +131,13 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(rows)
     print(f"wrote {out} ({len(rows)} rows)")
-    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'2.10':>8}{'2.40':>8}{'2.80':>8}{'mean3':>9}{'monomer':>10}{'kcal':>8}")
+    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'2.10':>8}{'2.40':>8}{'2.80':>8}{'monomer':>9}"
+          f"{'mean4':>9}{'kcal':>8}")
     for r in rows:
         print(f"{r['ecutjy_Ry']:>7}{r['r_cut_AU']:>7}"
               f"{r['dE_2.10_meV_per_atom']:>8}{r['dE_2.40_meV_per_atom']:>8}"
-              f"{r['dE_2.80_meV_per_atom']:>8}{r['dE_mean3_meV_per_atom']:>9}"
-              f"{r['dE_monomer_meV_per_atom']:>10}{r['dE_mean3_kcal_per_atom']:>8}")
+              f"{r['dE_2.80_meV_per_atom']:>8}{r['dE_monomer_meV_per_atom']:>9}"
+              f"{r['dE_mean4_meV_per_atom']:>9}{r['dE_mean4_kcal_per_atom']:>8}")
     return 0
 
 
