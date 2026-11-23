@@ -11,9 +11,25 @@ with it.  Copy this directory somewhere and point ABACUS at it.
 | `U_gga_12au_125Ry_6s3p3d3f2g.orb` | 466 KB | TZDP scheme, 105 functions/atom, spillage 5.9091e-04 |
 
 Produced by `abacus.orbgen.base` workchain **PK 562761** with `ecutwfc 180 Ry` and
-`spill_guess: atomic`, fitting against U2 at 2.10 / 2.40 / 2.80 A plus the monomer.
-`spillage` is the fraction of the primitive-basis states the contracted set fails to
-span, i.e. how much accuracy the contraction throws away.
+`spill_guess: atomic`.  `spillage` is the fraction of the primitive-basis states the
+contracted set fails to span, i.e. how much accuracy the contraction throws away.
+
+### Which geometries are the fit targets
+
+Four SCFs were run, but they do not all enter the objective:
+
+| geometry | ran | role |
+|---|---|---|
+| U2 2.10 A | yes | **fit target** |
+| U2 2.40 A | yes | **fit target** |
+| U2 2.80 A | yes | **fit target** |
+| monomer | yes | **initial guess only** |
+
+`spill_guess: atomic` adds the monomer job so that the optimiser can start from linear
+combinations of its s/p/d/f bands (`SIAB/abacus/api.py`, comment `# then the initial
+guess`); `SIAB/driver/main.py` builds the fit folder list from `geoms[].pertmags`, which
+contains only the three bond lengths.  With `spill_guess: random` the monomer job would
+not be submitted at all.
 
 ## The .orb header does not name a pseudopotential
 

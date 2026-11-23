@@ -44,11 +44,24 @@ difference from the NAO side is the basis.
 | U2 2.80 A | -4950.826505580118 | 580303 |
 | monomer | -2473.881319189626 | 580305 |
 
-`dE_mean4` is the headline: the mean over **all four** reference geometries, with the
-monomer weighted the same as each dimer.  Those four structures are exactly what the
-orbital generator fits against, so the average describes the product rather than one
-particular bond length.  `dE_mean3` (dimers only) is kept because it is what the older
-tables quoted.
+`dE_mean4` is the headline: the mean error over **all four** reference geometries, the
+monomer weighted the same as each dimer.  It measures how well the primitive basis spans
+these structures, i.e. it bounds the accuracy available to the contraction.
+
+It is **not** the set the spillage fit optimises.  Four SCFs are run, with different
+roles:
+
+| geometry | ran | role |
+|---|---|---|
+| U2 2.10 A | yes | fit target |
+| U2 2.40 A | yes | fit target |
+| U2 2.80 A | yes | fit target |
+| monomer | yes | `spill_guess: atomic` initial guess only |
+
+`SIAB/abacus/api.py` adds the monomer job under the comment `# then the initial guess`,
+and `SIAB/driver/main.py` builds the fit folder list from `geoms[].pertmags`, which holds
+only the three bond lengths.  `dE_mean3` (dimers only) is kept because it is what the
+older tables quoted.
 
 | ecutjy | r_cut | 2.10 | 2.40 | 2.80 | monomer | **mean4** |
 | ecutjy | r_cut | 2.10 | 2.40 | 2.80 | mean3 | **monomer** |

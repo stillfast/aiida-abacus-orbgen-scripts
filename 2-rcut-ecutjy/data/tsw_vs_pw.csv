@@ -1,14 +1,17 @@
 # TSW (primitive, uncontracted NSW) basis vs plane waves.
 # Same 35 Bohr (18.5212 A) cubic cell, same pseudopotential
-# (U.pbe-n-nc.UPF), ecutwfc 180 Ry, gamma_only.  Only the basis differs.
-# dE = (E_TSW - E_PW) / n_atoms, meV/atom.  The headline number is
-# dE_mean4 is the headline: the mean over all four geometries,
-# the monomer weighted the same as each dimer.  dE_mean3 (dimers
-# only) is kept for comparison with the older tables.
-# because its r_cut error does not cancel (kappa ~ 1).
+# (U.pbe-n-nc.UPF), ecutwfc 180 Ry, gamma_only; only the basis differs.
+# dE = (E_TSW - E_PW) / n_atoms, meV/atom.  1 kcal/mol = 43.364 meV/atom.
+#
+# dE_mean4 is the headline: the mean error over all four reference
+# geometries (2.10/2.40/2.80 A dimers + monomer, equal weight).  It
+# measures how well the primitive basis spans these structures.  It is
+# NOT the set the spillage fit optimises -- that is the three dimers
+# only, the monomer serving as the spill_guess:atomic initial guess.
+# dE_mean3 (three dimers) is kept for comparison with older tables.
+#
 # PW (eV): 2.10 = -4951.807006023504, 2.40 = -4952.064018093108,
 #          2.80 = -4950.826505580118, monomer = -2473.881319189626
-# 1 kcal/mol = 43.364 meV/atom.
 ecutjy_Ry,r_cut_AU,dE_2.10_meV_per_atom,dE_2.40_meV_per_atom,dE_2.80_meV_per_atom,dE_monomer_meV_per_atom,dE_mean3_meV_per_atom,dE_mean3_kcal_per_atom,dE_mean4_meV_per_atom,dE_mean4_kcal_per_atom,workchain_pk
 100,9,543.02,526.92,528.77,649.47,532.9,12.289,562.05,12.961,563426
 100,10,497.71,479.41,482.6,556.78,486.58,11.221,504.13,11.625,563442
