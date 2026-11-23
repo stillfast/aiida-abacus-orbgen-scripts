@@ -2,8 +2,10 @@
 # |E_LCAO - E_PW| per atom, meV.  1 kcal/mol = 43.364 meV/atom.
 # PW reference at ecutwfc 180 Ry, 35 Bohr cell:
 #   2.10 A = -4951.807006023504 eV,  2.40 A = -4952.064018093108 eV
-# Only the 2.10/2.40 A geometries have a PW run, so the 2.80 A
-# column of the old tables is not reproduced here.
-label,pk,r_cut_AU,ecutjy_Ry,l_max,dE_2.10_meV_per_atom,dE_2.40_meV_per_atom
-3,468814,12,150,3,60.3,42.0
-4,468557,12,150,4,27.3,20.4
+# All four geometries the orbital generator uses are covered:
+# U2 at 2.10/2.40/2.80 A plus the monomer, same 35 Bohr cell.
+# dE_mean3 is the mean over the three dimers; the monomer is
+# listed separately because its r_cut error does not cancel.
+label,pk,r_cut_AU,ecutjy_Ry,l_max,dE_2.10_meV_per_atom,dE_2.40_meV_per_atom,dE_2.80_meV_per_atom,dE_monomer_meV_per_atom,dE_mean3_meV_per_atom
+3,468814,12,150,3,60.28,42.02,29.81,19.81,44.03
+4,468557,12,150,4,27.29,20.43,17.02,19.81,21.58

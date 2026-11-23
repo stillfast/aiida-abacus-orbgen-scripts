@@ -33,7 +33,9 @@ def main() -> int:
 
     timing = read(DATA / "timings.csv")
     energy = {(float(r["ecutjy_Ry"]), float(r["r_cut_AU"])):
-              (float(r["dE_mean3_meV_per_atom"]), float(r["dE_mean3_kcal_per_atom"]), r["workchain_pk"])
+              (float(r["dE_mean3_meV_per_atom"]), float(r["dE_mean3_kcal_per_atom"]),
+               float(r["dE_monomer_meV_per_atom"]) if r["dE_monomer_meV_per_atom"] else None,
+               r["workchain_pk"])
               for r in read(DATA / "tsw_vs_pw.csv")}
 
     cost, monomer, iters = {}, {}, {}
@@ -47,7 +49,7 @@ def main() -> int:
     rows = []
     for key in sorted(cost):
         e, rc = key
-        d_mev, d_kcal, pk = energy.get(key, (None, None, ""))
+        d_mev, d_kcal, d_mono, pk = energy.get(key, (None, None, None, ""))
         rows.append({
             "ecutjy_Ry": f"{e:g}", "r_cut_AU": f"{rc:g}",
             "n_scf": sum(1 for r in timing
@@ -55,8 +57,9 @@ def main() -> int:
             "total_wall_min": round(cost[key], 1),
             "monomer_wall_min": round(monomer.get(key, 0.0), 1),
             "total_scf_iterations": iters[key],
-            "dE_meV_per_atom": d_mev if d_mev is not None else "",
-            "dE_kcal_per_atom": d_kcal if d_kcal is not None else "",
+            "dE_mean3_meV_per_atom": d_mev if d_mev is not None else "",
+            "dE_mean3_kcal_per_atom": d_kcal if d_kcal is not None else "",
+            "dE_monomer_meV_per_atom": d_mono if d_mono is not None else "",
             "verdict": ("pass" if d_mev is not None and d_mev <= BAR_MEV else "fail")
                         if d_mev is not None else "",
             "workchain_pk": pk,
@@ -78,7 +81,8 @@ def main() -> int:
     print(f"\n{'ecutjy':>7}{'r_cut':>7}{'min':>9}{'dE meV/at':>12}{'kcal/at':>9}{'verdict':>9}")
     for r in rows:
         print(f"{r['ecutjy_Ry']:>7}{r['r_cut_AU']:>7}{r['total_wall_min']:>9.1f}"
-              f"{r['dE_meV_per_atom']:>12}{r['dE_kcal_per_atom']:>9}{r['verdict']:>9}")
+              f"{r['dE_mean3_meV_per_atom']:>12}{r['dE_monomer_meV_per_atom']:>9}"
+              f"{r['dE_mean3_kcal_per_atom']:>9}{r['verdict']:>9}")
     return 0
 
 

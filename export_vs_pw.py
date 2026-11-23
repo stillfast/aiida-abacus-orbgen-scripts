@@ -24,7 +24,9 @@ from pathlib import Path
 
 KCAL = 43.364
 #: plane-wave total energies at ecutwfc 180 Ry, 35 Bohr cell
-PW = {"2.10": -4951.807006023504, "2.40": -4952.064018093108, "2.80": None}
+#: all four geometries the orbital generator actually uses.  561552/561562/580303/580305.
+PW = {"2.10": -4951.807006023504, "2.40": -4952.064018093108,
+      "2.80": -4950.826505580118, "monomer": -2473.881319189626}
 
 #: (label, workchain PK, r_cut au, ecutjy Ry, l_max)
 LADDERS = {
@@ -58,9 +60,10 @@ def walk(node, acc):
             try:
                 atoms = child.inputs.structure.get_ase()
                 if len(atoms) == 1:
-                    continue
-                z = sorted(float(p[2]) for p in atoms.positions)
-                key = f"{z[1] - z[0]:.2f}"
+                    key = "monomer"
+                else:
+                    z = sorted(float(p[2]) for p in atoms.positions)
+                    key = f"{z[1] - z[0]:.2f}"
             except Exception:                                    # noqa: BLE001
                 continue
             e = energy(child)
@@ -71,11 +74,13 @@ def walk(node, acc):
 
 
 def vs_pw(acc):
+    """dE = (E_NAO - E_PW) / n_atoms, meV/atom, on every geometry we have a PW for."""
     out = {}
-    for bl, epw in PW.items():
-        if epw is None or bl not in acc:
+    for geo, epw in PW.items():
+        if geo not in acc:
             continue
-        out[bl] = (max(acc[bl]) - epw) / 2.0 * 1000.0     # meV per atom, 2 atoms
+        natoms = 1 if geo == "monomer" else 2
+        out[geo] = (max(acc[geo]) - epw) / natoms * 1000.0
     return out
 
 
@@ -99,13 +104,19 @@ def main() -> int:
             acc = {}
             walk(node, acc)
             d = vs_pw(acc)
+            geoms = ("2.10", "2.40", "2.80")
+            mean3 = (sum(d[g] for g in geoms) / 3.0
+                     if all(g in d for g in geoms) else None)
             rows.append({"label": label, "pk": pk, "r_cut_AU": r_cut,
                          "ecutjy_Ry": ecutjy, "l_max": l_max,
-                         **{f"dE_{bl}_meV_per_atom": (round(v, 1) if bl in d else "")
-                            for bl, v in [(b, d.get(b)) for b in ("2.10", "2.40")]}})
+                         **{f"dE_{g}_meV_per_atom": (round(d[g], 2) if g in d else "")
+                            for g in geoms},
+                         "dE_monomer_meV_per_atom": (round(d["monomer"], 2)
+                                                     if "monomer" in d else ""),
+                         "dE_mean3_meV_per_atom": (round(mean3, 2)
+                                                   if mean3 is not None else "")})
             print(f"  {name} {label:>4}  pk={pk}  " +
-                  "  ".join(f"{k.split('_')[1]}: {v:.1f}" for k, v in
-                            [(f"dE_{b}", d[b]) for b in sorted(d)]) if d else "  (no PW pair)")
+                  "  ".join(f"{g}: {d[g]:.1f}" for g in sorted(d)))
 
         path = out / f"{name}_ladder.csv"
         with path.open("w", newline="") as handle:
@@ -113,8 +124,10 @@ def main() -> int:
             handle.write("# |E_LCAO - E_PW| per atom, meV.  1 kcal/mol = 43.364 meV/atom.\n")
             handle.write("# PW reference at ecutwfc 180 Ry, 35 Bohr cell:\n")
             handle.write("#   2.10 A = -4951.807006023504 eV,  2.40 A = -4952.064018093108 eV\n")
-            handle.write("# Only the 2.10/2.40 A geometries have a PW run, so the 2.80 A\n")
-            handle.write("# column of the old tables is not reproduced here.\n")
+            handle.write("# All four geometries the orbital generator uses are covered:\n")
+            handle.write("# U2 at 2.10/2.40/2.80 A plus the monomer, same 35 Bohr cell.\n")
+            handle.write("# dE_mean3 is the mean over the three dimers; the monomer is\n")
+            handle.write("# listed separately because its r_cut error does not cancel.\n")
             writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
             writer.writeheader()
             writer.writerows(rows)
