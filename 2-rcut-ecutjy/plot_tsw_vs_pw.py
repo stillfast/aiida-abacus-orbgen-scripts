@@ -1,173 +1,131 @@
 #!/usr/bin/env python
-"""TSW (NSW primitive) basis vs plane waves: total-energy error against r_cut.
+"""Truncated spherical-wave (primitive NSW) basis versus plane waves.
 
-x = r_cut (a.u.), y = |E_TSW - E_PW| in meV/atom on a **linear** axis, one curve per
-ecutjy.  Both axes are per atom, matching the paper's Table II convention
-("总能量, eV/atom") and its chemical-accuracy bar of 1 kcal/mol = 43.364 meV/atom.
+Left  -- dE against r_cut, one curve per ecutjy.  Solid is the mean over the three
+         dimers, dashed is the monomer.  The monomer is drawn separately because its
+         r_cut error does not cancel (kappa ~ 1), so folding it into the dimer mean
+         would hide exactly what forces r_cut to 11 au.
+Right -- the four reference geometries at r_cut 12, i.e. how the error is distributed
+         over bond lengths.  Those are the same four structures the orbital generator
+         fits against, so this panel is the one that connects to the product.
 
-Note the convention: the project's older `rcut_lmax` tables quoted the error per
-**dimer**, and 1 kcal/mol there is 43.364 meV per dimer = 21.68 meV/atom, i.e. twice as
-strict.  Mixing the two shifts every verdict by a factor of two, so the figure states
-the per-atom value and the code keeps the conversion explicit.
+Reads data/tsw_vs_pw.csv only; no database is touched.
+
+    python plot_tsw_vs_pw.py [--from-csv data/tsw_vs_pw.csv]
 """
 from __future__ import annotations
 
 import argparse
-import re
+import csv
 import sys
 from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoMinorLocator
 
-KCAL_MEV = 43.364
-
-
-def energy_of(node):
-    rf = node.outputs.retrieved
-    for sub in ("OUT.aiida", "OUT.ABACUS"):
-        try:
-            txt = rf.get_object_content(f"{sub}/running_scf.log")
-        except Exception:                                        # noqa: BLE001
-            continue
-        hits = re.findall(r"!FINAL_ETOT_IS\s+(-?[0-9.]+)", txt)
-        if hits:
-            return float(hits[-1])
-    return None
+HERE = Path(__file__).resolve().parent
+DATA = HERE / "data"
+KCAL = 43.364
+STYLE = {100.0: ("#c0392b", "s"), 125.0: ("#2471a3", "o"), 150.0: ("#1e8449", "^")}
+GEOMS = ("2.10", "2.40", "2.80")
 
 
-def collect(pw_refs: dict[str, float]) -> list[dict]:
-    from aiida import load_profile
-    from aiida.orm import Group
+def read(path: Path) -> list[dict]:
+    with path.open() as handle:
+        return list(csv.DictReader(l for l in handle if not l.startswith("#")))
 
-    load_profile("aiida_profile")
-    rows, seen = [], set()
-    # the large-memory points live in their own group, so scan every campaign group
-    for label in ("orbgen-rcut-ecutjy", "orbgen-rcut-ecutjy-d2",
-                  "orbgen-control-r10-j150"):
-        try:
-            group = Group.collection.get(label=label)
-        except Exception:                                        # noqa: BLE001
-            continue
-        for node in group.nodes:
-            if type(node).__name__ != "WorkChainNode":
-                continue
-            if node.process_state.value != "finished" or node.exit_status != 0:
-                continue
-            s = node.inputs.settings.get_dict()
-            key = (s["ecutjy"], s["r_cut"])
-            if key in seen:
-                continue
-            energies = {}
-            for child in node.called:
-                if type(child).__name__ != "CalcJobNode":
-                    continue
-                m = re.search(r"dimer_(\d)_(\d+)_", child.label or "")
-                if m:
-                    energies[f"{m.group(1)}.{m.group(2)}"] = energy_of(child)
-            deltas = [(energies[b] - e) / 2 * 1000.0 for b, e in pw_refs.items()
-                      if energies.get(b) is not None]
-            if not deltas:
-                continue
-            seen.add(key)
-            rows.append({"ecutjy": s["ecutjy"], "r_cut": s["r_cut"],
-                         "dE": sum(deltas) / len(deltas), "pk": node.pk})
-    return rows
+
+def numeric(row: dict, key: str):
+    v = row.get(key, "")
+    return float(v) if v not in ("", None) else None
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--from-csv", default=str(DATA / "tsw_vs_pw.csv"),
+                    help="the point table; default is the shipped data/tsw_vs_pw.csv")
     ap.add_argument("--out", default="tsw_vs_pw.png")
-    ap.add_argument("--from-csv", default=None,
-                    help="plot from a saved CSV instead of querying AiiDA, so the "
-                         "figure is reproducible without the database")
-    ap.add_argument("--csv-out", default=None,
-                    help="also write the collected points to this CSV")
     args = ap.parse_args()
 
-    pw = {"2.10": -4951.807006023504, "2.40": -4952.064018093108}   # ecutwfc 180
-    if args.from_csv:
-        import csv
-        rows = []
-        with Path(args.from_csv).open() as handle:
-            for row in csv.DictReader(r for r in handle if not r.startswith("#")):
-                rows.append({"ecutjy": float(row["ecutjy_Ry"]),
-                             "r_cut": float(row["r_cut_AU"]),
-                             "dE": float(row["dE_mean3_meV_per_atom"]),
-                             "pk": row.get("pk", "")})
-        print(f"read {len(rows)} points from {args.from_csv}")
-    else:
-        rows = collect(pw)
-    if not rows:
-        print("no finished points")
-        return 2
+    rows = read(Path(args.from_csv))
+    points = []
+    for r in rows:
+        points.append({
+            "ecutjy": float(r["ecutjy_Ry"]), "r_cut": float(r["r_cut_AU"]),
+            "mean3": numeric(r, "dE_mean3_meV_per_atom"),
+            "monomer": numeric(r, "dE_monomer_meV_per_atom"),
+            "per_geom": {g: numeric(r, f"dE_{g}_meV_per_atom") for g in GEOMS},
+            "pk": r.get("workchain_pk", ""),
+        })
 
-    if args.csv_out:
-        import csv
-        out_csv = Path(args.csv_out)
-        out_csv.parent.mkdir(parents=True, exist_ok=True)
-        with out_csv.open("w", newline="") as handle:
-            # comments are written as plain text, not through csv.writer, so that a
-            # reader can simply skip every line that starts with '#'
-            handle.write("# TSW (primitive NSW basis) vs plane waves, ecutwfc 180 Ry.\n")
-            handle.write("# dE is per atom; the 1 kcal/mol bar is 43.364 meV/atom.\n")
-            handle.write("# PW reference: 2.10 A = -4951.807006023504 eV, "
-                         "2.40 A = -4952.064018093108 eV\n")
-            handle.write("# pk = the abacus.orbgen.base workchain.\n")
-            writer = csv.writer(handle)
-            writer.writerow(["ecutjy_Ry", "r_cut_AU",
-                             "dE_meV_per_atom", "dE_kcal_per_atom", "pk"])
-            for r in sorted(rows, key=lambda x: (x["ecutjy"], x["r_cut"])):
-                writer.writerow([f"{r['ecutjy']:g}", f"{r['r_cut']:g}",
-                                 f"{r['dE']:.2f}", f"{r['dE']/KCAL_MEV:.3f}", r["pk"]])
-        print(f"wrote {out_csv}")
+    plt.rcParams.update({"font.size": 11, "axes.linewidth": 1.1,
+                         "xtick.direction": "in", "ytick.direction": "in",
+                         "xtick.top": True, "ytick.right": True,
+                         "legend.frameon": False, "savefig.dpi": 300,
+                         "savefig.bbox": "tight"})
+    fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.2),
+                             gridspec_kw={"width_ratios": [1.35, 1.0]})
 
-    plt.rcParams.update({
-        "font.family": "DejaVu Sans", "font.size": 11,
-        "axes.linewidth": 1.1, "xtick.direction": "in", "ytick.direction": "in",
-        "xtick.top": True, "ytick.right": True, "xtick.major.size": 5,
-        "ytick.major.size": 5, "xtick.minor.size": 2.6, "ytick.minor.size": 2.6,
-        "xtick.minor.visible": True, "ytick.minor.visible": True,
-        "legend.frameon": False, "savefig.dpi": 300, "savefig.bbox": "tight",
-    })
-
-    style = {100.0: ("#c0392b", "s"), 125.0: ("#2471a3", "o"), 150.0: ("#1e8449", "^")}
-    fig, ax = plt.subplots(figsize=(5.2, 4.0))
-
-    for e in sorted({r["ecutjy"] for r in rows}):
-        sel = sorted([r for r in rows if r["ecutjy"] == e], key=lambda r: r["r_cut"])
-        colour, marker = style.get(e, ("k", "o"))
-        ax.plot([r["r_cut"] for r in sel], [r["dE"] for r in sel], "-",
-                color=colour, lw=1.5, zorder=2)
-        ax.plot([r["r_cut"] for r in sel], [r["dE"] for r in sel], marker,
-                color=colour, ms=7, mfc="white", mew=1.5, zorder=3,
-                label=rf"$E_{{\rm cut}}^{{\rm jY}}$ = {e:g} Ry")
-
-    ax.axhline(KCAL_MEV, color="0.25", ls="--", lw=1.1, zorder=1)
-    ax.annotate(r"1 kcal/mol = 43.4 meV/atom", xy=(9.0, KCAL_MEV),
-                xytext=(0, 5), textcoords="offset points",
-                fontsize=9.5, color="0.15", va="bottom")
-
+    ax = axes[0]
+    for e in sorted({p["ecutjy"] for p in points}):
+        sel = sorted([p for p in points if p["ecutjy"] == e], key=lambda p: p["r_cut"])
+        colour, marker = STYLE.get(e, ("k", "o"))
+        ax.plot([p["r_cut"] for p in sel], [p["mean3"] for p in sel], "-",
+                color=colour, lw=1.6, marker=marker, ms=7, mfc="white", mew=1.5,
+                label=rf"$E_{{\rm cut}}^{{\rm jY}}$ = {e:g} Ry, 3-dimer mean")
+        mono = [(p["r_cut"], p["monomer"]) for p in sel if p["monomer"] is not None]
+        if len(mono) == len(sel):
+            ax.plot([m[0] for m in mono], [m[1] for m in mono], "--",
+                    color=colour, lw=1.1, alpha=0.75, marker=marker, ms=5,
+                    mfc="none", mew=1.1)
+    ax.axhline(KCAL, color="0.25", ls="--", lw=1.1)
+    ax.annotate(r"1 kcal/mol = 43.4 meV/atom", xy=(8.7, KCAL), xytext=(0, 5),
+                textcoords="offset points", fontsize=9, color="0.15")
     ax.set_xlabel(r"$r_{\rm cut}$  (a.u.)")
-    ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom, mean of 3 dimers)")
-    ax.set_xlim(8.6, 12.4)
-    ax.set_ylim(0, 600)
-    ax.xaxis.set_minor_locator(AutoMinorLocator(2))
-    ax.yaxis.set_minor_locator(AutoMinorLocator(2))
-    ax.legend(loc="upper right", handlelength=1.6, borderaxespad=0.4)
-    fig.tight_layout()
+    ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom)")
+    ax.set_title("solid: mean of the 3 dimers   dashed: monomer", fontsize=10)
+    ax.set_xticks([9, 10, 11, 12])
+    ax.legend(loc="upper right", fontsize=8.5, handlelength=1.8)
+    ax.grid(alpha=0.25)
 
-    out = Path(__file__).resolve().parent / args.out
+    ax = axes[1]
+    ref = [p for p in points if p["r_cut"] == 12.0]
+    ref.sort(key=lambda p: p["ecutjy"])
+    labels = ("2.10", "2.40", "2.80", "mono")
+    width = 0.26
+    for i, p in enumerate(ref):
+        colour, _ = STYLE.get(p["ecutjy"], ("k", "o"))
+        vals = [p["per_geom"][g] for g in GEOMS] + [p["monomer"]]
+        xs = [j + (i - 1) * width for j in range(4)]
+        ax.bar(xs, vals, width=width, color=colour, edgecolor="k", lw=0.6,
+               label=rf"{p['ecutjy']:g} Ry")
+        for x, v in zip(xs, vals):
+            if v is not None:
+                ax.annotate(f"{v:.0f}", (x, v), textcoords="offset points",
+                            xytext=(0, 3), ha="center", fontsize=7)
+    ax.axhline(KCAL, color="0.25", ls="--", lw=1.1)
+    ax.set_xticks(range(4), ["2.10 Å", "2.40 Å", "2.80 Å", "monomer"], fontsize=9.5)
+    ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom)", fontsize=10)
+    ax.set_title(r"$r_{\rm cut}$ = 12 au", fontsize=10)
+    ax.set_yscale("log")
+    ax.legend(fontsize=8.5, loc="upper left")
+    ax.grid(alpha=0.25, axis="y", which="both")
+
+    fig.tight_layout()
+    out = HERE / args.out
     fig.savefig(out)
     print(f"wrote {out}")
 
-    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'dE meV/at':>12}{'kcal/mol/atom':>15}"
-          f"{'kcal/mol/dimer':>16}")
-    for r in sorted(rows, key=lambda x: (x["ecutjy"], x["r_cut"])):
-        print(f"{r['ecutjy']:>7g}{r['r_cut']:>7g}{r['dE']:>12.1f}"
-              f"{r['dE']/KCAL_MEV:>15.2f}{r['dE']*2/KCAL_MEV:>16.2f}")
+    print(f"\n{'ecutjy':>7}{'r_cut':>7}{'2.10':>9}{'2.40':>9}{'2.80':>9}"
+          f"{'mean3':>9}{'monomer':>10}{'kcal/at':>9}")
+    for p in sorted(points, key=lambda x: (x["ecutjy"], x["r_cut"])):
+        f = p["per_geom"]
+        print(f"{p['ecutjy']:>7g}{p['r_cut']:>7g}"
+              f"{f['2.10']:>9.1f}{f['2.40']:>9.1f}{f['2.80']:>9.1f}"
+              f"{p['mean3']:>9.1f}{(p['monomer'] if p['monomer'] else float('nan')):>10.1f}"
+              f"{p['mean3']/KCAL:>9.2f}")
     return 0
 
 
