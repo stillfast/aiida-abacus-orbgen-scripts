@@ -77,8 +77,10 @@ def main() -> int:
                 textcoords="offset points", fontsize=9, color="0.15")
     ax.set_xlabel(r"$r_{\rm cut}$  (a.u.)")
     ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom)")
-    ax.set_title("mean over U$_2$ 2.10/2.40/2.80 Å and the monomer", fontsize=10)
     ax.set_xticks([9, 10, 11, 12])
+    # headroom above the data so the legend does not sit on the top-most curve
+    top = max(p["mean4"] for p in points if p["mean4"] is not None)
+    ax.set_ylim(0, top * 1.40)
     ax.legend(loc="upper right", fontsize=8.5, handlelength=1.8)
     ax.grid(alpha=0.25)
 
