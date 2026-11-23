@@ -95,7 +95,7 @@ def main() -> int:
             for row in csv.DictReader(r for r in handle if not r.startswith("#")):
                 rows.append({"ecutjy": float(row["ecutjy_Ry"]),
                              "r_cut": float(row["r_cut_AU"]),
-                             "dE": float(row["dE_meV_per_atom"]),
+                             "dE": float(row["dE_mean3_meV_per_atom"]),
                              "pk": row.get("pk", "")})
         print(f"read {len(rows)} points from {args.from_csv}")
     else:
@@ -151,7 +151,7 @@ def main() -> int:
                 fontsize=9.5, color="0.15", va="bottom")
 
     ax.set_xlabel(r"$r_{\rm cut}$  (a.u.)")
-    ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom)")
+    ax.set_ylabel(r"$|E_{\rm TSW} - E_{\rm PW}|$  (meV/atom, mean of 3 dimers)")
     ax.set_xlim(8.6, 12.4)
     ax.set_ylim(0, 600)
     ax.xaxis.set_minor_locator(AutoMinorLocator(2))

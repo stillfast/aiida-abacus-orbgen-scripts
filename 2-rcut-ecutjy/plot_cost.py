@@ -35,7 +35,7 @@ def main() -> int:
     args = ap.parse_args()
 
     timing = read("timings.csv")
-    energy = {(float(r["ecutjy_Ry"]), float(r["r_cut_AU"])): float(r["dE_meV_per_atom"])
+    energy = {(float(r["ecutjy_Ry"]), float(r["r_cut_AU"])): float(r["dE_mean3_meV_per_atom"])
               for r in read("tsw_vs_pw.csv")}
 
     cost = {}

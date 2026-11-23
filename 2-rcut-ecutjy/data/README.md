@@ -30,8 +30,43 @@ with 1 kcal/mol = 43.364 meV/atom.  The ladder files used to quote the atomizati
 energy difference against another LCAO set (a 50 meV bar); they were re-derived from
 the same AiiDA workchains by `export_vs_pw.py`, so `data/` no longer mixes criteria.
 
-Only the 2.10 and 2.40 A geometries have a PW run, so the 2.80 A column of the older
-tables is not reproduced here.  The r_cut 9-12 rows agree with `tsw_vs_pw.csv` to
+## The reference set is now complete
+
+The four PW references are all present and were produced with the **same** cell (35 Bohr
+= 18.5212 A cubic), the **same** pseudopotential (`U.pbe-n-nc.UPF`, md5 shared with the
+NAO runs), the same `ecutwfc 180 Ry` and the same `gamma_only` setting, so the only
+difference from the NAO side is the basis.
+
+| geometry | PW total energy (eV) | PK |
+|---|---:|---|
+| U2 2.10 A | -4951.807006023504 | 561552 |
+| U2 2.40 A | -4952.064018093108 | 561562 |
+| U2 2.80 A | -4950.826505580118 | 580303 |
+| monomer | -2473.881319189626 | 580305 |
+
+`dE_mean3` is the mean over the **three dimers** and is what the figure and
+`cost_vs_accuracy.csv` use.  `dE_monomer` is reported separately on purpose: the
+monomer carries the `r_cut` error without cancellation (kappa ~ 1), so folding it into
+the dimer mean would hide the very thing that makes `r_cut` need 11 au.
+
+| ecutjy | r_cut | 2.10 | 2.40 | 2.80 | mean3 | **monomer** |
+|---|---:|---:|---:|---:|---:|---:|
+| 125 | 12 | 51.71 | 44.79 | 42.47 | 46.32 | 47.86 |
+| 150 | 11 | 43.10 | 35.44 | 31.28 | 36.61 | 41.42 |
+| 150 | 12 | 27.30 | 20.43 | 17.02 | **21.58** | **19.81** |
+
+Note the progression in the last row: the error shrinks as the bond stretches, and the
+monomer (19.8 meV) is *smaller* than the mean over the compressed dimers.  That is the
+opposite of the earlier r_cut behaviour, which is why both numbers are kept.
+
+## A discarded PW reference
+
+`new_nao/ecutjy_r12_l4/PW-ref/` holds a monomer PW run at **-2473.617376 eV** that must
+not be used: its `STRU` has `LATTICE_CONSTANT 1.889726877` with
+`LATTICE_VECTORS = 20 0 0 / 0 20 0 / 0 0 20`, i.e. a 20 A (37.8 Bohr) cube, not the
+35 Bohr cell the NAO runs use.  Comparing against it produces a *negative* dE
+(-244 meV), which would violate the variational bound and is a symptom of the cell
+mismatch, not of a better basis.  PK 580305 replaces it.  The r_cut 9-12 rows agree with `tsw_vs_pw.csv` to
 0.1 meV (e.g. r_cut 12 at ecutjy 150: (27.3 + 20.4)/2 = 23.9 meV/atom), which is the
 check that the pooling is sound.
 

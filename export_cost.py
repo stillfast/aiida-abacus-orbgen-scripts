@@ -33,7 +33,7 @@ def main() -> int:
 
     timing = read(DATA / "timings.csv")
     energy = {(float(r["ecutjy_Ry"]), float(r["r_cut_AU"])):
-              (float(r["dE_meV_per_atom"]), float(r["dE_kcal_per_atom"]), r["pk"])
+              (float(r["dE_mean3_meV_per_atom"]), float(r["dE_mean3_kcal_per_atom"]), r["workchain_pk"])
               for r in read(DATA / "tsw_vs_pw.csv")}
 
     cost, monomer, iters = {}, {}, {}
